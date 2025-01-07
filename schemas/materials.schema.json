@@ -1,0 +1,99 @@
+{
+	"$schema": "http://json-schema.org/draft/2020-12/schema",
+	"title": "Rusty Pipes Materials Definition",
+	"type": "object",
+	"properties": {
+		"pipe_materials": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"$ref": "#/$defs/id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"absolute_roughness": {
+						"title": "Absolute roughness of the material in meters",
+						"type": "number",
+						"minimum": 0
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"absolute_roughness"
+				]
+			}
+		},
+		"fluids": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"$ref": "#/$defs/id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"kinematic_viscosity": {
+						"title": "Kinematic viscosity of the fluid in m^2/s",
+						"type": "number",
+						"minimum": 0
+					},
+					"density": {
+						"title": "Density of the fluid in kg/m^3",
+						"type": "number",
+						"minimum": 0
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"kinematic_viscosity",
+					"density"
+				]
+			}
+		},
+		"components": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"$ref": "#/$defs/id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"minor_loss_coefficient": {
+						"title": "Minor loss coefficient of the component",
+						"type": "number",
+						"minimum": 0
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"minor_loss_coefficient"
+				]
+			}
+		},
+		"required": [
+			"pipe_materials",
+			"fluids",
+			"components"
+		]
+	},
+	"$defs": {
+		"id": {
+			"title": "String identifier of the material",
+			"type": "string",
+			"pattern": [
+				"^[A-Z0-9_]+$"
+			]
+		}
+	}
+}

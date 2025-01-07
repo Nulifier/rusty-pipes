@@ -3,4 +3,22 @@ name = "rusty_pipes"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+path = "src/lib.rs"
+
+[[example]]
+name = "basic-network"
+path = "examples/basic-network.rs"
+
 [dependencies]
+serde = { version = "1.0.217", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1.0.135"
+
+# [profile.release]
+# strip = true        # Automatically strip debug symbols from the binary
+# opt-level = "z"     # Optimize for size
+# lto = true          # Enable link-time optimization
+# codegen-units = 1   # Use only one codegen unit to reduce binary size
+# panic = "abort"     # Abort on panic to reduce binary size

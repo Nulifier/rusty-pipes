@@ -1,0 +1,10 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/src/materials.json"
+            ],
+            "url": "./schemas/materials.schema.json"
+        }
+    ]
+}

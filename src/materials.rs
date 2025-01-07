@@ -1,55 +1,109 @@
-#[derive(Debug)]
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
+
+#[derive(Deserialize, Serialize, Debug)]
 pub struct PipeMaterial {
-    /// Absolute roughness of the pipe material in meters
-    pub absolute_roughness: f64,
+	/// Identifier of the pipe material
+	pub id: String,
+
+	/// Name of the pipe material
+	pub name: String,
+
+	/// Absolute roughness of the pipe material in meters
+	pub absolute_roughness: f64,
 }
 
-#[allow(dead_code)]
-pub const COMMERCIAL_STEEL: PipeMaterial = PipeMaterial {
-    absolute_roughness: 0.000045,
-};
-
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Fluid {
-    /// Kinematic viscosity of the fluid in m^2/s
-    pub kinematic_viscosity: f64,
+	/// Identifier of the fluid
+	pub id: String,
 
-    /// Density of the fluid in kg/m^3
-    pub density: f64,
+	/// Name of the fluid
+	pub name: String,
+
+	/// Kinematic viscosity of the fluid in m^2/s
+	pub kinematic_viscosity: f64,
+
+	/// Density of the fluid in kg/m^3
+	pub density: f64,
 }
 
-#[allow(dead_code)]
-pub const WATER: Fluid = Fluid {
-    kinematic_viscosity: 1.0e-6,
-    density: 1000.0,
-};
-
-#[allow(dead_code)]
-pub const OIL_WTI: Fluid = Fluid {
-    kinematic_viscosity: 0.00010735,    // @ 38 degrees C
-    density: 894.61,
-};
-
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Component {
-    pub minor_loss_coefficient: f64,
+	/// Identifier of the component
+	pub id: String,
+
+	/// Name of the component
+	pub name: String,
+
+	pub minor_loss_coefficient: f64,
 }
 
-#[allow(dead_code)]
-pub const ELBOW_FLANGED_SHORT_RADIUS_90: Component = Component {
-    minor_loss_coefficient: 0.3,
-};
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MaterialList {
+	pub pipe_materials: Vec<PipeMaterial>,
+	pub fluids: Vec<Fluid>,
+	pub components: Vec<Component>,
+}
 
-#[allow(dead_code)]
-pub const ELBOW_FLANGED_SHORT_RADIUS_45: Component = Component {
-    minor_loss_coefficient: 0.3,
-};
+#[derive(Serialize, Deserialize, Debug)]
+pub struct MaterialLibrary {
+	// pub pipe_materials: Vec<PipeMaterial>,
+	// pub fluids: Vec<Fluid>,
+	// pub components: Vec<Component>,
+	materials: MaterialList,
 
-#[allow(dead_code)]
-pub const ELBOW_FLANGED_LONG_RADIUS_45: Component = Component {
-    minor_loss_coefficient: 0.2,
-};
+	#[serde(skip)]
+	pipe_material_lookup: BTreeMap<String, usize>,
 
-#[allow(dead_code)]
-pub const ELBOW_FLANGED_LONG_RADIUS_90: Component = Component {
-    minor_loss_coefficient: 0.2,
-};
+	#[serde(skip)]
+	fluid_lookup: BTreeMap<String, usize>,
+
+	#[serde(skip)]
+	component_lookup: BTreeMap<String, usize>,
+}
+
+impl MaterialLibrary {
+	pub fn new(materials: MaterialList) -> MaterialLibrary {
+		let pipe_material_lookup = materials
+			.pipe_materials
+			.iter()
+			.enumerate()
+			.map(|(i, pipe_material)| (pipe_material.id.clone(), i))
+			.collect();
+		let fluid_lookup = materials
+			.fluids
+			.iter()
+			.enumerate()
+			.map(|(i, fluid)| (fluid.id.clone(), i))
+			.collect();
+		let component_lookup = materials
+			.components
+			.iter()
+			.enumerate()
+			.map(|(i, component)| (component.id.clone(), i))
+			.collect();
+
+		MaterialLibrary {
+			materials,
+			pipe_material_lookup,
+			fluid_lookup,
+			component_lookup,
+		}
+	}
+
+	pub fn get_pipe_material(&self, id: &str) -> &PipeMaterial {
+		let index = self.pipe_material_lookup.get(id).unwrap();
+		&self.materials.pipe_materials[*index]
+	}
+
+	pub fn get_fluid(&self, id: &str) -> &Fluid {
+		let index = self.fluid_lookup.get(id).unwrap();
+		&self.materials.fluids[*index]
+	}
+
+	pub fn get_component(&self, id: &str) -> &Component {
+		let index = self.component_lookup.get(id).unwrap();
+		&self.materials.components[*index]
+	}
+}

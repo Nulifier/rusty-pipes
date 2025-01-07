@@ -1,4 +1,6 @@
 use crate::constants::GRAVITY;
+use crate::materials::{PipeMaterial, Fluid};
+use crate::calculations;
 
 #[derive(Debug)]
 pub enum NodeType {
@@ -18,7 +20,7 @@ pub struct Node {
 }
 
 #[derive(Debug)]
-pub struct Pipe {
+pub struct Pipe<'a> {
 	pub start_node_index: usize,
 	pub end_node_index: usize,
 
@@ -28,7 +30,7 @@ pub struct Pipe {
 	// Diameter of the pipe in meters
 	pub diameter: f64,
 
-	pub absolute_roughness: f64,
+	pub pipe_material: &'a PipeMaterial,
 
 	pub minor_loss_coefficients: f64,
 
@@ -43,31 +45,32 @@ pub struct Pipe {
 }
 
 #[derive(Debug)]
-pub struct Network {
+pub struct Network<'a> {
 	pub nodes: Vec<Node>,
-	pub links: Vec<Pipe>,
+	pub links: Vec<Pipe<'a>>,
 
-	pub fluid_density: f64,
-	pub fluid_kinematic_viscosity: f64,
+	pub fluid: &'a Fluid,
 }
 
-impl Network {
+impl Network<'_> {
 	pub fn update(&mut self) {
 		for link in self.links.iter_mut() {
 			let start_node = &self.nodes[link.start_node_index];
 			let end_node = &self.nodes[link.end_node_index];
 
 			let head_pump = link.pump_head;
-			let head_dynamic = (start_node.pressure - end_node.pressure) / (self.fluid_density * GRAVITY);
-			let head_difference = start_node.elevation - end_node.elevation;
+			let head_dynamic = (start_node.pressure - end_node.pressure) / (self.fluid.density * GRAVITY);
+			let head_difference = end_node.elevation - start_node.elevation;
 
 			let numerator = 2.0 * GRAVITY * (head_pump - head_dynamic - head_difference);
 
-			let reynolds_number = link.flow_velocity * link.diameter / self.fluid_kinematic_viscosity;
-			let friction_factor = if ;
+			let reynolds_number = calculations::calc_reynolds_number(link.flow_velocity, link.diameter, self.fluid.kinematic_viscosity);
+			let friction_factor = calculations::calc_friction_factor(reynolds_number, link.pipe_material.absolute_roughness, link.diameter);
+
+			let denominator = friction_factor * link.length / link.diameter + link.minor_loss_coefficients;
 
 			// Calculate flow velocity
-			link.flow_velocity = 2.0 * GRAVITY;
+			link.flow_velocity = (numerator / denominator).sqrt();
 		}
 	}
 }

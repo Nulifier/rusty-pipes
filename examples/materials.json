@@ -1,0 +1,45 @@
+{
+    "pipe_materials": [
+        {
+            "id": "COMMERCIAL_STEEL",
+            "name": "Commercial Steel",
+            "absolute_roughness": 0.045e-3
+        }
+    ],
+    "fluids": [
+        {
+            "id": "WATER",
+            "name": "Water",
+            "kinematic_viscosity": 1e-6,
+            "density": 1000
+        },
+        {
+            "id": "OIL_WTI",
+            "name": "Oil (WTI)",
+            "kinematic_viscosity": 0.00010735,
+            "density": 894.61
+        }
+    ],
+    "components": [
+        {
+            "id": "ELBOW_FLANGED_SHORT_RADIUS_90",
+            "name": "Elbow, flanged, short radius, 90°",
+            "minor_loss_coefficient": 0.3
+        },
+        {
+            "id": "ELBOW_FLANGED_LONG_RADIUS_90",
+            "name": "Elbow, flanged, long radius, 90°",
+            "minor_loss_coefficient": 0.2
+        },
+        {
+            "id": "ELBOW_FLANGED_SHORT_RADIUS_45",
+            "name": "Elbow, flanged, short radius, 45°",
+            "minor_loss_coefficient": 0.3
+        },
+        {
+            "id": "ELBOW_FLANGED_LONG_RADIUS_45",
+            "name": "Elbow, flanged, long radius, 45°",
+            "minor_loss_coefficient": 0
+        }
+    ]
+}
